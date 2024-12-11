@@ -172,15 +172,12 @@ impl WordSearch {
             for x in 0..self.grid[y].len() {
                 for word in &self.words {
                     let words = self.get_x_shape(x, y);
-                    match words {
-                        Some(words) => {
-                            // The word needs to be in there twice
-                            let matches = words.iter().filter(|w| *w == word).count();
-                            if matches > 1 {
-                                count += 1;
-                            }
+                    if let Some(words) = words {
+                        // The word needs to be in there twice
+                        let matches = words.iter().filter(|w| *w == word).count();
+                        if matches > 1 {
+                            count += 1;
                         }
-                        None => {}
                     }
                 }
             }

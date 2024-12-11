@@ -205,50 +205,6 @@ impl<'a> TrailMap<'a> {
         }
         rating
     }
-
-    fn print_trailheads(&self) {
-        // This should build a string and return it
-        // If a tile is a trailhead, print a T
-        // If a tile is a top, print a X
-        for trailhead in self.get_trailheads() {
-            println!(
-                "Trailhead: ({}, {})",
-                trailhead.borrow().x,
-                trailhead.borrow().y
-            );
-            println!("Score: {}", trailhead.borrow_mut().get_score());
-            // Get the starting tile and add it to a list
-            // Get all the next tiles and add them to the list
-            let mut next_steps = trailhead.borrow().next_steps.clone();
-            let mut visited = vec![trailhead];
-            while !next_steps.is_empty() {
-                let next = next_steps.pop().unwrap();
-                // println!("Next: ({}, {})", next.borrow().x, next.borrow().y);
-                next_steps.extend(next.borrow().next_steps.clone());
-                visited.push(next);
-            }
-            let mut s = String::new();
-            for y in 0..self.height {
-                for x in 0..self.width {
-                    let tile = &self.map[y][x];
-                    if visited.contains(&tile) {
-                        let height = tile.borrow().height;
-                        if height == 0 {
-                            s.push('T');
-                        } else if tile.borrow().is_top() {
-                            s.push('X');
-                        } else {
-                            s.push(height.to_string().chars().next().unwrap());
-                        }
-                    } else {
-                        s.push('.');
-                    }
-                }
-                s.push('\n');
-            }
-            println!("{}", s);
-        }
-    }
 }
 
 pub fn part_one(input: &str) -> Option<usize> {

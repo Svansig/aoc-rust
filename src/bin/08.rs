@@ -5,8 +5,6 @@ advent_of_code::solution!(8);
 type Antenna = char;
 
 struct Location {
-    x: usize,
-    y: usize,
     antenna: Option<Antenna>,
     antinodes: Vec<Antenna>,
 }
@@ -23,11 +21,9 @@ impl CityMap {
         let mut antennas = HashSet::new();
         let locations: Vec<Vec<Location>> = input
             .lines()
-            .enumerate()
-            .map(|(y, line)| {
+            .map(|line| {
                 line.chars()
-                    .enumerate()
-                    .map(|(x, c)| {
+                    .map(|c| {
                         let antenna = if c != '.' {
                             antennas.insert(c);
                             Some(c)
@@ -35,8 +31,6 @@ impl CityMap {
                             None
                         };
                         Location {
-                            x,
-                            y,
                             antenna,
                             antinodes: vec![],
                         }
@@ -66,7 +60,7 @@ impl CityMap {
     fn set_antinode(&mut self, x: usize, y: usize, antenna: Antenna) {
         let location = self.get_location_mut(x, y);
         match location {
-            None => return,
+            None => (),
             Some(location) => {
                 if !location.antinodes.contains(&antenna) {
                     location.antinodes.push(antenna);
@@ -132,79 +126,6 @@ impl CityMap {
             }
         }
     }
-
-    fn set_antinodes_undistanced(&mut self) {
-        // This one should set antinodes wherever the line through two antennas passes through a location
-        // with or without an antenna.
-        let mut passed_through_both = 0;
-        let mut total = 0;
-
-        for antenna in &self.antennas.clone() {
-            let mut locations: Vec<(usize, usize)> = vec![];
-            for (y, row) in self.locations.iter().enumerate() {
-                for (x, location) in row.iter().enumerate() {
-                    if location.antenna == Some(*antenna) {
-                        locations.push((x, y));
-                    }
-                }
-            }
-            for (x1, y1) in &locations {
-                for (x2, y2) in &locations {
-                    if x1 == x2 && y1 == y2 {
-                        continue;
-                    }
-                    // Essentially we are drawing a line through here and looking for where it passes through whole x and y values
-                    // and setting antinodes there
-                    let slope = (*y2 as f64 - *y1 as f64) / (*x2 as f64 - *x1 as f64);
-                    let y_intercept = *y1 as f64 - slope * *x1 as f64;
-                    let mut times_crossed = 0;
-                    for x in 0..self.width {
-                        let y = slope * x as f64 + y_intercept;
-                        // If this is a whole number
-                        let fudge_factor = 0.0000003;
-                        let close_enough =
-                            y.fract() < fudge_factor || y.fract() > (1.0 - fudge_factor);
-                        if close_enough && y >= 0.0 {
-                            let y = if y.fract() < fudge_factor {
-                                y.floor() as usize
-                            } else {
-                                y.ceil() as usize
-                            };
-                            self.set_antinode(x, y, *antenna);
-                            if x == *x1 && y == *y1 {
-                                times_crossed += 1;
-                            }
-                            if x == *x2 && y == *y2 {
-                                times_crossed += 1;
-                            }
-                        }
-                    }
-                    if times_crossed != 2 {
-                        println!(
-                            "Times crossed: {}, x1: {}, y1: {}, x2: {}, y2: {}",
-                            times_crossed, *x1, *y1, *x2, *y2
-                        );
-                        println!("y = {}x + {}", slope, y_intercept);
-                        println!(
-                            "Y: {}, should be: {}",
-                            slope * *x1 as f64 + y_intercept,
-                            *y1
-                        );
-                        println!(
-                            "Y: {}, should be: {}",
-                            slope * *x2 as f64 + y_intercept,
-                            *y2
-                        );
-                    } else {
-                        passed_through_both += 1;
-                    }
-                    total += 1;
-                }
-            }
-        }
-        println!("Passed through both: {} / {}", passed_through_both, total);
-    }
-
     fn is_in_bounds(&self, x: isize, y: isize) -> bool {
         x >= 0
             && x < self.width.try_into().unwrap()
@@ -271,26 +192,6 @@ impl CityMap {
                     .count()
             })
             .sum()
-    }
-
-    fn to_string(&self) -> String {
-        let mut result = String::new();
-        for row in &self.locations {
-            for location in row {
-                match location.antenna {
-                    Some(antenna) => result.push(antenna),
-                    None => {
-                        if location.antinodes.is_empty() {
-                            result.push('.')
-                        } else {
-                            result.push('#')
-                        }
-                    }
-                }
-            }
-            result.push('\n');
-        }
-        result
     }
 }
 

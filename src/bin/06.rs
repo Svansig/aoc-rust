@@ -65,11 +65,8 @@ impl BuildingMap {
         let mut obstructable_positions = Vec::new();
         for (y, row) in self.positions.iter().enumerate() {
             for (x, position) in row.iter().enumerate() {
-                match position {
-                    Position::Empty => {
-                        obstructable_positions.push((x, y));
-                    }
-                    _ => {}
+                if position == &Position::Empty {
+                    obstructable_positions.push((x, y));
                 }
             }
         }
@@ -124,7 +121,7 @@ impl Guard {
 
     fn clone(&self) -> Self {
         Guard {
-            position: self.position.clone(),
+            position: self.position,
             facing: self.facing.clone(),
             map: self.map.clone(),
             steps_taken: self.steps_taken,
@@ -135,15 +132,11 @@ impl Guard {
         match self.map.get(x, y) {
             Some(Position::Empty) => {
                 self.map.set(x, y, Position::Occupied);
-                return true;
+                true
             }
-            Some(Position::Occupied) | Some(Position::Visited(_)) => {
-                return false;
-            }
-            None => {
-                return false;
-            }
-        };
+            Some(Position::Occupied) | Some(Position::Visited(_)) => false,
+            None => false,
+        }
     }
 
     fn get_possible_obstructable_positions(&self) -> Vec<(usize, usize)> {
@@ -248,7 +241,7 @@ impl Guard {
                 }
             }
         };
-        return false;
+        false
     }
 
     fn get_visited_count(&self) -> usize {
@@ -268,10 +261,8 @@ pub fn part_two(input: &str) -> Option<usize> {
 
     for (x, y) in guard.get_possible_obstructable_positions() {
         let mut guard_clone = guard.clone();
-        if guard_clone.set_obstruction(x, y) {
-            if guard_clone.check_walk_loop() {
-                possible_obstruction_spots_count += 1;
-            }
+        if guard_clone.set_obstruction(x, y) && guard_clone.check_walk_loop() {
+            possible_obstruction_spots_count += 1;
         }
     }
 

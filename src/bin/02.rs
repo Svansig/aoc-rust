@@ -12,7 +12,7 @@ pub fn parse_input(input: &str) -> Vec<Vec<usize>> {
     split.collect()
 }
 
-pub fn all_increasing(report: &Vec<usize>) -> bool {
+pub fn all_increasing(report: &[usize]) -> bool {
     // We need to iterate through the report and make sure that
     // They are all increasing
     let mut iter = report.iter();
@@ -27,7 +27,7 @@ pub fn all_increasing(report: &Vec<usize>) -> bool {
     true
 }
 
-pub fn all_decreasing(report: &Vec<usize>) -> bool {
+pub fn all_decreasing(report: &[usize]) -> bool {
     // We need to iterate through the report and make sure that
     // They are all decreasing
     let mut iter = report.iter();
@@ -42,7 +42,7 @@ pub fn all_decreasing(report: &Vec<usize>) -> bool {
     true
 }
 
-pub fn all_diff_less_than_three(report: &Vec<usize>) -> bool {
+pub fn all_diff_less_than_three(report: &[usize]) -> bool {
     // We need to iterate through the report and make sure that
     // The difference between each value is less than or equal to 3
     let mut iter = report.iter();
@@ -60,14 +60,14 @@ pub fn all_diff_less_than_three(report: &Vec<usize>) -> bool {
     true
 }
 
-pub fn report_is_safe(report: &Vec<usize>) -> bool {
+pub fn report_is_safe(report: &[usize]) -> bool {
     // We need to iterate through the report and make sure that
     // They are either all increasing or all decreasing
     // And that the difference between each value is less than or equal to 3
     all_diff_less_than_three(report) && (all_increasing(report) || all_decreasing(report))
 }
 
-pub fn report_is_safe_with_removal(report: &Vec<usize>) -> bool {
+pub fn report_is_safe_with_removal(report: &[usize]) -> bool {
     // We need to iterate through the report and make sure that
     // They are either all increasing or all decreasing
     // And that the difference between each value is less than or equal to 3
@@ -78,7 +78,7 @@ pub fn report_is_safe_with_removal(report: &Vec<usize>) -> bool {
     // Else we need to make new reports with each value removed
     // So we can loop through the indexes and remove the value at that index
     for (index, _) in report.iter().enumerate() {
-        let mut new_report = report.clone();
+        let mut new_report = report.to_vec();
         new_report.remove(index);
         if report_is_safe(&new_report) {
             return true;

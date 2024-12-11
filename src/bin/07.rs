@@ -18,14 +18,6 @@ enum Operators {
 }
 
 impl Operators {
-    fn get_char(&self) -> String {
-        match self {
-            Operators::Add => "+".to_string(),
-            Operators::Multiply => "*".to_string(),
-            Operators::Concatenate => "||".to_string(),
-        }
-    }
-
     fn apply(&self, a: usize, b: usize) -> usize {
         match self {
             Operators::Add => a + b,
@@ -76,19 +68,6 @@ impl Solution {
             }
         }
         acc
-    }
-
-    fn print(&self) -> () {
-        let mut result = Vec::new();
-        result.push(self.evaluate().to_string());
-        result.push("=".to_string());
-        for operator in self.operators.iter() {
-            match operator {
-                Expression::Value(x) => result.push(x.to_string()),
-                Expression::Operator(op) => result.push(op.get_char()),
-            }
-        }
-        println!("{}", result.join(" "));
     }
 }
 

@@ -59,15 +59,12 @@ impl Disk {
         let mut chars = input
             .trim()
             .chars()
-            .filter(|c| c.is_digit(10))
+            .filter(|c| c.is_ascii_digit())
             .map(|c| c.to_digit(10).unwrap() as usize);
 
         while let Some(used) = chars.next() {
             let free = chars.next();
-            let free = match free {
-                Some(f) => f,
-                None => 0,
-            };
+            let free = free.unwrap_or(0);
             files.push_back(DiskFile {
                 id: file_index,
                 starting_index: block_index,

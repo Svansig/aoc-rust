@@ -32,7 +32,7 @@ impl SafetyManual {
         SafetyManual { updates, graph }
     }
 
-    fn is_sorted(&self, update: &Vec<usize>) -> bool {
+    fn is_sorted(&self, update: &[usize]) -> bool {
         // We need to loop through every item in the update list
         let mut queue: VecDeque<usize> = update.iter().cloned().collect();
         while let Some(item) = queue.pop_front() {
@@ -42,7 +42,7 @@ impl SafetyManual {
             }
             // If it does not depend on any other item in the list, add it to the sorted list
             for remaining_item in &queue.clone() {
-                if !self.graph.contains_key(&remaining_item) {
+                if !self.graph.contains_key(remaining_item) {
                     println!("Remaining item missing in graph: {:?}", remaining_item);
                     continue;
                 }
@@ -51,7 +51,7 @@ impl SafetyManual {
                 }
             }
         }
-        return true;
+        true
     }
 
     fn create_graph(adj_list: Vec<(usize, usize)>) -> HashMap<usize, HashSet<usize>> {
@@ -59,14 +59,12 @@ impl SafetyManual {
         for &(from, to) in &adj_list {
             graph.entry(from).or_insert_with(HashSet::new).insert(to);
             // If the to node is not in the graph, add it
-            if !graph.contains_key(&to) {
-                graph.insert(to, HashSet::new());
-            }
+            graph.entry(to).or_insert_with(HashSet::new);
         }
         graph
     }
 
-    fn sort(&mut self, update: &Vec<usize>) -> Vec<usize> {
+    fn sort(&mut self, update: &[usize]) -> Vec<usize> {
         let mut sorted = Vec::new();
         // For each item, if it does not depend on any other item in the list, add it to the queue
         let mut queue: VecDeque<usize> = update.iter().cloned().collect();
@@ -74,7 +72,7 @@ impl SafetyManual {
             // If it does not depend on any other item in the list, add it to the sorted list
             let mut is_in_order = true;
             for remaining_item in &queue.clone() {
-                if !self.graph.contains_key(&remaining_item) {
+                if !self.graph.contains_key(remaining_item) {
                     self.graph.insert(*remaining_item, HashSet::new());
                 }
                 if self.graph[remaining_item].contains(&item) {
@@ -119,7 +117,7 @@ impl SafetyManual {
     }
 }
 
-pub fn get_middle_item<T>(list: &Vec<T>) -> &T {
+pub fn get_middle_item<T>(list: &[T]) -> &T {
     let middle = list.len() / 2;
     &list[middle]
 }
@@ -132,7 +130,7 @@ pub fn part_one(input: &str) -> Option<usize> {
     let ordered_updates = manual.get_ordered_updates();
     let middle_item = ordered_updates
         .iter()
-        .map(|update| *get_middle_item(&update))
+        .map(|update| *get_middle_item(update))
         .collect::<Vec<usize>>();
     let sum: usize = middle_item.iter().sum();
     Some(sum)
