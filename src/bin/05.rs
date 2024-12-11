@@ -33,14 +33,19 @@ impl SafetyManual {
     }
 
     fn is_sorted(&self, update: &Vec<usize>) -> bool {
-        // This should take the update list and return a topological sort of the list based on the adj_list
-        // Return None if it is not possible to sort the list
-
         // We need to loop through every item in the update list
         let mut queue: VecDeque<usize> = update.iter().cloned().collect();
         while let Some(item) = queue.pop_front() {
+            // If the item isn't in the graph, it doesn't depend on any other item
+            if !self.graph.contains_key(&item) {
+                continue;
+            }
             // If it does not depend on any other item in the list, add it to the sorted list
             for remaining_item in &queue.clone() {
+                if !self.graph.contains_key(&remaining_item) {
+                    println!("Remaining item missing in graph: {:?}", remaining_item);
+                    continue;
+                }
                 if self.graph[remaining_item].contains(&item) {
                     return false;
                 }
@@ -53,6 +58,10 @@ impl SafetyManual {
         let mut graph = HashMap::new();
         for &(from, to) in &adj_list {
             graph.entry(from).or_insert_with(HashSet::new).insert(to);
+            // If the to node is not in the graph, add it
+            if !graph.contains_key(&to) {
+                graph.insert(to, HashSet::new());
+            }
         }
         graph
     }
@@ -65,6 +74,9 @@ impl SafetyManual {
             // If it does not depend on any other item in the list, add it to the sorted list
             let mut is_in_order = true;
             for remaining_item in &queue.clone() {
+                if !self.graph.contains_key(&remaining_item) {
+                    self.graph.insert(*remaining_item, HashSet::new());
+                }
                 if self.graph[remaining_item].contains(&item) {
                     queue.push_back(item);
                     queue.retain(|&x| x != *remaining_item);
@@ -148,12 +160,12 @@ mod tests {
     #[test]
     fn test_part_one() {
         let result = part_one(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, Some(5452));
+        assert_eq!(result, Some(143));
     }
 
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, Some(4598));
+        assert_eq!(result, Some(123));
     }
 }

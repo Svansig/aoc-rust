@@ -107,6 +107,10 @@ impl Disk {
             let last_block = self.blocks.pop();
             match last_block {
                 Some(Some(block)) => {
+                    if index >= self.blocks.len() {
+                        self.blocks.push(Some(block));
+                        break;
+                    }
                     while self.blocks[index].is_some() {
                         index += 1;
                         if index >= self.blocks.len() {
