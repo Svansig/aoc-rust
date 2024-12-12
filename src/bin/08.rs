@@ -41,7 +41,6 @@ impl CityMap {
         let width = locations[0].len();
         let height = locations.len();
 
-        println!("CityMap: {}x{}", width, height);
         CityMap {
             locations,
             antennas,

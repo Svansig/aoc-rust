@@ -89,8 +89,6 @@ impl SafetyManual {
         }
         // Sorted should be the same length as the update list
         if sorted.len() != update.len() {
-            println!("Update: {:?}", update);
-            println!("Sorted: {:?}", sorted);
             panic!("Could not sort the list");
         }
         sorted
